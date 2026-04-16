@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { api } from "@/lib/api";
 import type { ApplicationStatus } from "@/types/visa";
 
 const STATUS_ICONS: Record<ApplicationStatus, typeof Send> = {
@@ -54,20 +55,12 @@ export default function StatusPage() {
     setResult("loading");
 
     try {
-      const res = await fetch(`/api/status?id=${encodeURIComponent(appId)}&email=${encodeURIComponent(email)}`);
-
-      if (!res.ok) {
-        setResult("notFound");
-        toast.error(t("notFound"));
-        return;
-      }
-
-      const data = await res.json();
+      const data = await api.applications.status(appId, email) as unknown as AppResult;
       setAppData(data);
       setResult("found");
     } catch {
       setResult("notFound");
-      toast.error(common("error"));
+      toast.error(t("notFound"));
     }
   };
 

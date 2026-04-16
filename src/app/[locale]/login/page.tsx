@@ -4,12 +4,12 @@ import { useState, Suspense } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@i18n/navigation";
 import { useSearchParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LogIn, AlertCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { api, setToken } from "@/lib/api";
 
 export default function LoginPage() {
   return (
@@ -34,20 +34,16 @@ function LoginForm() {
     setError("");
     setLoading(true);
 
-    const supabase = createClient();
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (authError) {
-      setError(authError.message);
+    try {
+      const { access_token } = await api.auth.login(email, password);
+      setToken(access_token);
+      toast.success(t("welcomeBack"));
+      window.location.href = redirectTo;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    toast.success(t("welcomeBack"));
-    window.location.href = redirectTo;
   };
 
   return (

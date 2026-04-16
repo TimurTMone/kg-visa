@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@i18n/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { UserPlus, AlertCircle, Loader2, Mail } from "lucide-react";
+import { UserPlus, AlertCircle, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { api, setToken } from "@/lib/api";
 
 export default function SignupPage() {
   const t = useTranslations("auth");
@@ -17,7 +18,6 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,47 +30,17 @@ export default function SignupPage() {
 
     setLoading(true);
 
-    const supabase = createClient();
-    const { error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-
-    if (authError) {
-      setError(authError.message);
+    try {
+      const { access_token } = await api.auth.register(email, password);
+      setToken(access_token);
+      toast.success("Account created!");
+      window.location.href = "/";
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Registration failed");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    setSuccess(true);
-    setLoading(false);
   };
-
-  if (success) {
-    return (
-      <div className="bg-neutral-50 min-h-screen">
-        <div className="bg-gov-900 py-8 text-center text-white">
-          <h1 className="text-2xl font-bold sm:text-3xl">{t("signup")}</h1>
-        </div>
-        <div className="mx-auto max-w-md px-4 py-12">
-          <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm sm:p-8 text-center">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gov-100">
-              <Mail className="h-10 w-10 text-gov-500" />
-            </div>
-            <h2 className="text-xl font-bold text-neutral-900">
-              {t("checkEmail")}
-            </h2>
-            <p className="mt-3 text-sm text-neutral-500">
-              {t("checkEmailDesc")}
-            </p>
-            <Button asChild className="mt-6" variant="outline">
-              <Link href="/login">{t("login")}</Link>
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="bg-neutral-50 min-h-screen">

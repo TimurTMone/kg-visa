@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RotateCcw, AlertCircle, Info, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { api } from "@/lib/api";
 
 const continueSchema = z.object({
   refId: z
@@ -36,17 +37,7 @@ export default function ContinuePage() {
     setStatus("searching");
 
     try {
-      const res = await fetch(
-        `/api/apply/continue?id=${encodeURIComponent(data.refId)}&email=${encodeURIComponent(data.email)}`
-      );
-
-      if (!res.ok) {
-        setStatus("notFound");
-        toast.error(t("notFound"));
-        return;
-      }
-
-      const appData = await res.json();
+      const appData = await api.applications.continue_(data.refId, data.email);
 
       // Save to sessionStorage so the wizard can pick it up
       const wizardState = {

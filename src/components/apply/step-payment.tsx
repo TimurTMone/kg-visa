@@ -8,17 +8,7 @@ import { VISA_TYPES } from "@/lib/constants";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Link } from "@i18n/navigation";
-
-async function uploadFile(file: File, type: string): Promise<string | null> {
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("type", type);
-
-  const res = await fetch("/api/upload", { method: "POST", body: formData });
-  if (!res.ok) return null;
-  const data = await res.json();
-  return data.path;
-}
+import { api } from "@/lib/api";
 
 export function StepPayment() {
   const t = useTranslations("apply.payment");
@@ -41,36 +31,26 @@ export function StepPayment() {
       let invitationUrl: string | null = null;
 
       if (state.documents.photo) {
-        photoUrl = await uploadFile(state.documents.photo, "photo");
+        photoUrl = await api.upload.file(state.documents.photo, "photo");
       }
       if (state.documents.passportScan) {
-        passportScanUrl = await uploadFile(state.documents.passportScan, "passport_scan");
+        passportScanUrl = await api.upload.file(state.documents.passportScan, "passport_scan");
       }
       if (state.documents.invitation) {
-        invitationUrl = await uploadFile(state.documents.invitation, "invitation");
+        invitationUrl = await api.upload.file(state.documents.invitation, "invitation");
       }
 
       // 2. Submit application
-      const res = await fetch("/api/apply", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          personal: state.personal,
-          passport: state.passport,
-          travel: state.travel,
-          photoUrl,
-          passportScanUrl,
-          invitationUrl,
-        }),
+      const result = await api.applications.create({
+        personal: state.personal,
+        passport: state.passport,
+        travel: state.travel,
+        photoUrl,
+        passportScanUrl,
+        invitationUrl,
       });
 
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Submission failed");
-      }
-
-      const data = await res.json();
-      setRefId(data.refId);
+      setRefId(result.refId);
       setSubmitted(true);
       toast.success("Application submitted successfully!");
       sessionStorage.removeItem("kg-visa-wizard");
@@ -149,7 +129,6 @@ export function StepPayment() {
         </div>
       </div>
 
-      {/* Payment method selection (placeholder until Stripe) */}
       <div className="space-y-3">
         <div className="flex items-center gap-3 rounded-lg border-2 border-gov-500 bg-gov-50 p-4 cursor-pointer">
           <CreditCard className="h-5 w-5 text-gov-500" />
@@ -174,11 +153,7 @@ export function StepPayment() {
           <ArrowLeft className="h-4 w-4" />
           {tApply("back")}
         </Button>
-        <Button
-          size="lg"
-          disabled={processing}
-          onClick={handleSubmit}
-        >
+        <Button size="lg" disabled={processing} onClick={handleSubmit}>
           {processing ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />

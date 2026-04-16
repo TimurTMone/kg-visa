@@ -19,6 +19,7 @@ import {
   Copy,
 } from "lucide-react";
 import { toast } from "sonner";
+import { api } from "@/lib/api";
 
 const transferSchema = z.object({
   visaNumber: z.string().min(1, "Visa number is required"),
@@ -71,18 +72,7 @@ export default function TransferPage() {
     setStatus("submitting");
 
     try {
-      const res = await fetch("/api/transfer", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Submission failed");
-      }
-
-      const result = await res.json();
+      const result = await api.transfers.create(data);
       setTrackingId(result.trackingId);
       setSubmittedEmail(data.email);
       setStatus("success");
