@@ -14,8 +14,7 @@ import { toast } from "sonner";
 const continueSchema = z.object({
   refId: z
     .string()
-    .min(1, "Reference number is required")
-    .regex(/^KG-\d{4}-[A-Z0-9]{5}$/i, "Format: KG-2026-XXXXX"),
+    .min(1, "Reference number is required"),
   email: z.email("Please enter a valid email address"),
 });
 
@@ -36,30 +35,39 @@ export default function ContinuePage() {
   const onSubmit = async (data: ContinueFormData) => {
     setStatus("searching");
 
-    // Simulate API lookup
-    await new Promise((r) => setTimeout(r, 1500));
+    try {
+      const res = await fetch(
+        `/api/apply/continue?id=${encodeURIComponent(data.refId)}&email=${encodeURIComponent(data.email)}`
+      );
 
-    // Check sessionStorage for a matching draft
-    const saved = sessionStorage.getItem("kg-visa-wizard");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed.personal?.email?.toLowerCase() === data.email.toLowerCase()) {
-          setStatus("found");
-          toast.success(t("found"));
-          // Redirect to the apply page after a short delay
-          setTimeout(() => {
-            window.location.href = window.location.pathname.replace("/apply/continue", "/apply");
-          }, 1500);
-          return;
-        }
-      } catch {
-        // ignore parse errors
+      if (!res.ok) {
+        setStatus("notFound");
+        toast.error(t("notFound"));
+        return;
       }
-    }
 
-    setStatus("notFound");
-    toast.error(t("notFound"));
+      const appData = await res.json();
+
+      // Save to sessionStorage so the wizard can pick it up
+      const wizardState = {
+        currentStep: 1,
+        personal: appData.personal,
+        passport: appData.passport,
+        travel: appData.travel,
+      };
+      sessionStorage.setItem("kg-visa-wizard", JSON.stringify(wizardState));
+
+      setStatus("found");
+      toast.success(t("found"));
+
+      // Redirect to the apply page
+      setTimeout(() => {
+        window.location.href = window.location.pathname.replace("/apply/continue", "/apply");
+      }, 1000);
+    } catch {
+      setStatus("notFound");
+      toast.error(t("notFound"));
+    }
   };
 
   return (

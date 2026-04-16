@@ -9,12 +9,43 @@ import {
   FileText,
   ChevronDown,
   Shield,
+  LogIn,
+  LogOut,
+  User,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
+import { toast } from "sonner";
 
 export function Header() {
   const t = useTranslations("nav");
+  const tAuth = useTranslations("auth");
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    setUser(null);
+    setUserMenuOpen(false);
+    toast.success("Logged out");
+    window.location.href = "/";
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white/95 backdrop-blur-sm">
@@ -123,6 +154,48 @@ export function Header() {
           <div className="hidden md:block">
             <LocaleSwitcher />
           </div>
+
+          {user ? (
+            <div
+              className="relative"
+              onMouseEnter={() => setUserMenuOpen(true)}
+              onMouseLeave={() => setUserMenuOpen(false)}
+            >
+              <button className="hidden sm:flex items-center gap-2 rounded-lg border border-neutral-200 px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors">
+                <User className="h-4 w-4" />
+                <span className="max-w-[140px] truncate">
+                  {user.email}
+                </span>
+                <ChevronDown className="h-3.5 w-3.5" />
+              </button>
+              {userMenuOpen && (
+                <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-xl border border-neutral-200 bg-white p-2 shadow-lg">
+                  <Link
+                    href="/apply"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50"
+                  >
+                    <FileText className="h-4 w-4" />
+                    {t("apply")}
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-red-600 hover:bg-red-50"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    {tAuth("logout")}
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Button asChild size="sm" variant="outline" className="hidden sm:inline-flex">
+              <Link href="/login">
+                <LogIn className="h-4 w-4" />
+                {tAuth("login")}
+              </Link>
+            </Button>
+          )}
+
           <Button asChild size="sm" className="hidden sm:inline-flex">
             <Link href="/apply">{t("apply")}</Link>
           </Button>

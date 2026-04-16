@@ -284,6 +284,25 @@
     "newRequest": "Submit Another Request",
     "note": "Please ensure your new passport is valid for at least 6 months from today's date."
   },
+  "auth": {
+    "login": "Log In",
+    "signup": "Sign Up",
+    "email": "Email Address",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "loggingIn": "Logging in...",
+    "signingUp": "Creating account...",
+    "loginSubtitle": "Sign in to manage your visa applications",
+    "signupSubtitle": "Create an account to apply for your e-Visa",
+    "logout": "Log Out",
+    "passwordMismatch": "Passwords do not match",
+    "checkEmail": "Check your email",
+    "checkEmailDesc": "We sent you a confirmation link. Please check your email and click the link to activate your account.",
+    "welcomeBack": "Welcome back!"
+  },
   "common": {
     "learnMore": "Learn More",
     "getStarted": "Get Started",

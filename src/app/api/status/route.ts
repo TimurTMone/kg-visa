@@ -1,32 +1,37 @@
-import { db } from "@/lib/store";
+import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const id = searchParams.get("id");
+  const refId = searchParams.get("id");
   const email = searchParams.get("email");
 
-  if (!id || !email) {
+  if (!refId || !email) {
     return Response.json(
       { error: "Application ID and email are required" },
       { status: 400 }
     );
   }
 
-  const application = db.applications.findByIdAndEmail(id, email);
+  const supabase = await createClient();
 
-  if (!application) {
-    return Response.json(
-      { error: "Application not found" },
-      { status: 404 }
-    );
+  const { data, error } = await supabase
+    .from("applications")
+    .select("id, ref_id, status, first_name, last_name, visa_type, created_at, updated_at")
+    .eq("ref_id", refId)
+    .eq("email", email.toLowerCase())
+    .single();
+
+  if (error || !data) {
+    return Response.json({ error: "Application not found" }, { status: 404 });
   }
 
   return Response.json({
-    id: application.id,
-    status: application.status,
-    createdAt: application.createdAt,
-    updatedAt: application.updatedAt,
-    applicant: `${application.personal.firstName} ${application.personal.lastName}`,
-    visaType: application.travel.visaType,
+    id: data.id,
+    refId: data.ref_id,
+    status: data.status,
+    applicant: `${data.first_name} ${data.last_name}`,
+    visaType: data.visa_type,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
   });
 }

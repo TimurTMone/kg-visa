@@ -37,15 +37,6 @@ const transferSchema = z.object({
 
 type TransferFormData = z.infer<typeof transferSchema>;
 
-function generateTrackingId() {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let id = "TR-";
-  for (let i = 0; i < 8; i++) {
-    id += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return id;
-}
-
 export default function TransferPage() {
   const t = useTranslations("transferPage");
   const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
@@ -72,21 +63,34 @@ export default function TransferPage() {
       return;
     }
 
-    // Validate old !== new passport
     if (data.oldPassport.toUpperCase() === data.newPassport.toUpperCase()) {
       toast.error("New passport number must differ from the current one.");
       return;
     }
 
     setStatus("submitting");
-    // Simulate API call
-    await new Promise((r) => setTimeout(r, 2000));
 
-    const id = generateTrackingId();
-    setTrackingId(id);
-    setSubmittedEmail(data.email);
-    setStatus("success");
-    toast.success(t("successTitle"));
+    try {
+      const res = await fetch("/api/transfer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Submission failed");
+      }
+
+      const result = await res.json();
+      setTrackingId(result.trackingId);
+      setSubmittedEmail(data.email);
+      setStatus("success");
+      toast.success(t("successTitle"));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
+      setStatus("idle");
+    }
   };
 
   const handleNewRequest = () => {

@@ -13,18 +13,31 @@ import {
   Send,
   Loader2,
   AlertCircle,
+  XCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import type { ApplicationStatus } from "@/types/visa";
 
-type Status = "submitted" | "review" | "approved" | "issued";
+const STATUS_ICONS: Record<ApplicationStatus, typeof Send> = {
+  submitted: Send,
+  review: Clock,
+  approved: CheckCircle2,
+  issued: FileCheck,
+  rejected: XCircle,
+};
 
-const DEMO_STATUSES: { step: Status; icon: typeof Send; date: string }[] = [
-  { step: "submitted", icon: Send, date: "2026-04-10" },
-  { step: "review", icon: Clock, date: "2026-04-11" },
-  { step: "approved", icon: CheckCircle2, date: "2026-04-13" },
-  { step: "issued", icon: FileCheck, date: "2026-04-13" },
-];
+const STATUS_ORDER: ApplicationStatus[] = ["submitted", "review", "approved", "issued"];
+
+interface AppResult {
+  id: string;
+  refId: string;
+  status: ApplicationStatus;
+  applicant: string;
+  visaType: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function StatusPage() {
   const t = useTranslations("status");
@@ -32,23 +45,36 @@ export default function StatusPage() {
   const [result, setResult] = useState<"idle" | "loading" | "found" | "notFound">("idle");
   const [appId, setAppId] = useState("");
   const [email, setEmail] = useState("");
+  const [appData, setAppData] = useState<AppResult | null>(null);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!appId || !email) return;
 
     setResult("loading");
-    // Simulate API call
-    await new Promise((r) => setTimeout(r, 1200));
 
-    // Demo: show results if any input is given, otherwise not found
-    if (appId.startsWith("KG-")) {
+    try {
+      const res = await fetch(`/api/status?id=${encodeURIComponent(appId)}&email=${encodeURIComponent(email)}`);
+
+      if (!res.ok) {
+        setResult("notFound");
+        toast.error(t("notFound"));
+        return;
+      }
+
+      const data = await res.json();
+      setAppData(data);
       setResult("found");
-    } else {
+    } catch {
       setResult("notFound");
-      toast.error(t("notFound"));
+      toast.error(common("error"));
     }
   };
+
+  // Determine which steps are "done" based on current status
+  const currentStatusIndex = appData
+    ? STATUS_ORDER.indexOf(appData.status)
+    : -1;
 
   return (
     <div className="bg-neutral-50 min-h-screen">
@@ -110,34 +136,100 @@ export default function StatusPage() {
           </div>
         )}
 
-        {result === "found" && (
+        {result === "found" && appData && (
           <div className="mt-8 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm sm:p-8">
-            <h2 className="mb-6 text-lg font-semibold text-neutral-900">
-              {t("title")}
-            </h2>
-            <div className="space-y-0">
-              {DEMO_STATUSES.map((status, i) => {
-                const isLast = i === DEMO_STATUSES.length - 1;
-                return (
-                  <div key={status.step} className="flex gap-4">
-                    <div className="flex flex-col items-center">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
-                        <status.icon className="h-5 w-5 text-green-600" />
-                      </div>
-                      {!isLast && (
-                        <div className="w-0.5 flex-1 bg-green-200 my-1" />
-                      )}
-                    </div>
-                    <div className={cn("pb-6", isLast && "pb-0")}>
-                      <p className="font-medium text-neutral-900">
-                        {t(`timeline.${status.step}`)}
-                      </p>
-                      <p className="text-sm text-neutral-500">{status.date}</p>
-                    </div>
-                  </div>
-                );
-              })}
+            {/* Application info */}
+            <div className="mb-6 rounded-lg bg-neutral-50 p-4">
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <span className="text-neutral-500">Ref:</span>{" "}
+                  <span className="font-mono font-medium">{appData.refId}</span>
+                </div>
+                <div>
+                  <span className="text-neutral-500">Type:</span>{" "}
+                  <span className="font-medium capitalize">{appData.visaType}</span>
+                </div>
+                <div>
+                  <span className="text-neutral-500">Applicant:</span>{" "}
+                  <span className="font-medium">{appData.applicant}</span>
+                </div>
+                <div>
+                  <span className="text-neutral-500">Submitted:</span>{" "}
+                  <span className="font-medium">
+                    {new Date(appData.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
             </div>
+
+            {/* Timeline */}
+            {appData.status === "rejected" ? (
+              <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4">
+                <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
+                <div>
+                  <p className="font-medium text-red-700">
+                    {t("timeline.rejected")}
+                  </p>
+                  <p className="text-sm text-red-600">
+                    {new Date(appData.updatedAt).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-0">
+                {STATUS_ORDER.map((step, i) => {
+                  const isLast = i === STATUS_ORDER.length - 1;
+                  const isDone = i <= currentStatusIndex;
+                  const Icon = STATUS_ICONS[step];
+                  return (
+                    <div key={step} className="flex gap-4">
+                      <div className="flex flex-col items-center">
+                        <div
+                          className={cn(
+                            "flex h-10 w-10 items-center justify-center rounded-full",
+                            isDone
+                              ? "bg-green-100"
+                              : "bg-neutral-100"
+                          )}
+                        >
+                          <Icon
+                            className={cn(
+                              "h-5 w-5",
+                              isDone ? "text-green-600" : "text-neutral-400"
+                            )}
+                          />
+                        </div>
+                        {!isLast && (
+                          <div
+                            className={cn(
+                              "w-0.5 flex-1 my-1",
+                              isDone ? "bg-green-200" : "bg-neutral-200"
+                            )}
+                          />
+                        )}
+                      </div>
+                      <div className={cn("pb-6", isLast && "pb-0")}>
+                        <p
+                          className={cn(
+                            "font-medium",
+                            isDone ? "text-neutral-900" : "text-neutral-400"
+                          )}
+                        >
+                          {t(`timeline.${step}`)}
+                        </p>
+                        {isDone && (
+                          <p className="text-sm text-neutral-500">
+                            {i === currentStatusIndex
+                              ? new Date(appData.updatedAt).toLocaleDateString()
+                              : new Date(appData.createdAt).toLocaleDateString()}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
       </div>

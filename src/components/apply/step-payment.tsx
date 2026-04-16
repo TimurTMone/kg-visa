@@ -7,6 +7,18 @@ import { ArrowLeft, CreditCard, Lock, CheckCircle2, Loader2 } from "lucide-react
 import { VISA_TYPES } from "@/lib/constants";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Link } from "@i18n/navigation";
+
+async function uploadFile(file: File, type: string): Promise<string | null> {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("type", type);
+
+  const res = await fetch("/api/upload", { method: "POST", body: formData });
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data.path;
+}
 
 export function StepPayment() {
   const t = useTranslations("apply.payment");
@@ -14,9 +26,60 @@ export function StepPayment() {
   const { state, prevStep } = useWizard();
   const [submitted, setSubmitted] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [refId, setRefId] = useState("");
 
   const visaType = VISA_TYPES.find((v) => v.id === state.travel.visaType);
   const fee = visaType?.fee ?? 50;
+
+  const handleSubmit = async () => {
+    setProcessing(true);
+
+    try {
+      // 1. Upload documents
+      let photoUrl: string | null = null;
+      let passportScanUrl: string | null = null;
+      let invitationUrl: string | null = null;
+
+      if (state.documents.photo) {
+        photoUrl = await uploadFile(state.documents.photo, "photo");
+      }
+      if (state.documents.passportScan) {
+        passportScanUrl = await uploadFile(state.documents.passportScan, "passport_scan");
+      }
+      if (state.documents.invitation) {
+        invitationUrl = await uploadFile(state.documents.invitation, "invitation");
+      }
+
+      // 2. Submit application
+      const res = await fetch("/api/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          personal: state.personal,
+          passport: state.passport,
+          travel: state.travel,
+          photoUrl,
+          passportScanUrl,
+          invitationUrl,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Submission failed");
+      }
+
+      const data = await res.json();
+      setRefId(data.refId);
+      setSubmitted(true);
+      toast.success("Application submitted successfully!");
+      sessionStorage.removeItem("kg-visa-wizard");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   if (submitted) {
     return (
@@ -32,9 +95,27 @@ export function StepPayment() {
           receive a confirmation email at{" "}
           <strong>{state.personal.email}</strong> with your application ID.
         </p>
-        <p className="mt-2 text-sm text-neutral-400">
+        {refId && (
+          <div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-3">
+            <span className="text-xs font-medium text-neutral-500 uppercase">
+              Reference:
+            </span>
+            <span className="font-mono text-lg font-bold text-neutral-900">
+              {refId}
+            </span>
+          </div>
+        )}
+        <p className="mt-4 text-sm text-neutral-400">
           Processing typically takes 3 business days.
         </p>
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+          <Button asChild variant="secondary">
+            <Link href="/status">Check Status</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/">Back to Home</Link>
+          </Button>
+        </div>
       </div>
     );
   }
@@ -68,7 +149,7 @@ export function StepPayment() {
         </div>
       </div>
 
-      {/* Payment method selection (placeholder) */}
+      {/* Payment method selection (placeholder until Stripe) */}
       <div className="space-y-3">
         <div className="flex items-center gap-3 rounded-lg border-2 border-gov-500 bg-gov-50 p-4 cursor-pointer">
           <CreditCard className="h-5 w-5 text-gov-500" />
@@ -96,14 +177,7 @@ export function StepPayment() {
         <Button
           size="lg"
           disabled={processing}
-          onClick={async () => {
-            setProcessing(true);
-            await new Promise((r) => setTimeout(r, 2000));
-            setSubmitted(true);
-            setProcessing(false);
-            toast.success("Application submitted successfully!");
-            sessionStorage.removeItem("kg-visa-wizard");
-          }}
+          onClick={handleSubmit}
         >
           {processing ? (
             <>

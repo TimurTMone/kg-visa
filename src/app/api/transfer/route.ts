@@ -1,16 +1,22 @@
-import { db } from "@/lib/store";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
-
     const { visaNumber, oldPassport, newPassport, newPassportExpiry, email, reason } = body;
 
     if (!visaNumber || !oldPassport || !newPassport || !newPassportExpiry || !email || !reason) {
-      return Response.json(
-        { error: "All fields are required" },
-        { status: 400 }
-      );
+      return Response.json({ error: "All fields are required" }, { status: 400 });
     }
 
     if (oldPassport.toUpperCase() === newPassport.toUpperCase()) {
@@ -20,7 +26,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check that new passport expiry is at least 6 months away
     const expiry = new Date(newPassportExpiry);
     const sixMonths = new Date();
     sixMonths.setMonth(sixMonths.getMonth() + 6);
@@ -31,25 +36,32 @@ export async function POST(request: Request) {
       );
     }
 
-    const transfer = db.transfers.create({
-      visaNumber,
-      oldPassport,
-      newPassport,
-      newPassportExpiry,
-      email,
-      reason,
-    });
+    const { data, error } = await supabase
+      .from("transfers")
+      .insert({
+        user_id: user.id,
+        visa_number: visaNumber,
+        old_passport: oldPassport,
+        new_passport: newPassport,
+        new_passport_expiry: newPassportExpiry,
+        email,
+        reason,
+      })
+      .select("id, tracking_id, status, created_at")
+      .single();
+
+    if (error) {
+      return Response.json({ error: error.message }, { status: 500 });
+    }
 
     return Response.json({
-      id: transfer.id,
-      status: transfer.status,
-      createdAt: transfer.createdAt,
+      id: data.id,
+      trackingId: data.tracking_id,
+      status: data.status,
+      createdAt: data.created_at,
       message: "Transfer request submitted successfully",
     }, { status: 201 });
   } catch {
-    return Response.json(
-      { error: "Invalid request body" },
-      { status: 400 }
-    );
+    return Response.json({ error: "Invalid request body" }, { status: 400 });
   }
 }
