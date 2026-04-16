@@ -1,0 +1,297 @@
+{
+  "meta": {
+    "title": "e-Visa Kyrgyz Republic — Official Electronic Visa Portal",
+    "description": "Apply for an electronic visa to the Kyrgyz Republic. Fast, secure, and fully online. Issued by the Ministry of Foreign Affairs."
+  },
+  "nav": {
+    "home": "Home",
+    "apply": "Apply for Visa",
+    "continue": "Continue Application",
+    "status": "Check Status",
+    "transfer": "Visa Transfer",
+    "visaTypes": "Visa Types",
+    "eligibility": "Eligibility",
+    "faq": "FAQ",
+    "about": "About",
+    "contact": "Contact",
+    "services": "Services",
+    "information": "Information",
+    "login": "Log In"
+  },
+  "hero": {
+    "badge": "Official Government Portal",
+    "title": "Your Gateway to Kyrgyzstan",
+    "subtitle": "Apply for your electronic visa in minutes. Fully online, secure, and issued by the Ministry of Foreign Affairs of the Kyrgyz Republic.",
+    "cta": "Apply for e-Visa",
+    "ctaSecondary": "Check Eligibility",
+    "trusted": "Trusted by 100,000+ travelers worldwide"
+  },
+  "stats": {
+    "processing": "Processing Time",
+    "processingValue": "3 Business Days",
+    "fee": "Starting Fee",
+    "feeValue": "From $50",
+    "validity": "Visa Validity",
+    "validityValue": "30–90 Days"
+  },
+  "services": {
+    "title": "Our Services",
+    "subtitle": "Everything you need for your Kyrgyzstan visa",
+    "apply": {
+      "title": "Apply for Visa",
+      "description": "Start a new e-Visa application. Complete the form, upload documents, and pay online."
+    },
+    "continue": {
+      "title": "Continue Application",
+      "description": "Resume a previously saved application using your application reference number."
+    },
+    "status": {
+      "title": "Check Status",
+      "description": "Track your visa application status in real-time with your application ID."
+    },
+    "transfer": {
+      "title": "Visa Transfer",
+      "description": "Transfer your existing visa to a new passport or update your travel details."
+    }
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "subtitle": "Get your e-Visa in 3 simple steps",
+    "step1": {
+      "title": "Fill the Form",
+      "description": "Complete the online application with your personal and travel details. Takes about 5 minutes."
+    },
+    "step2": {
+      "title": "Upload Documents",
+      "description": "Upload a passport photo and a scan of your passport's data page. We accept JPEG and PNG."
+    },
+    "step3": {
+      "title": "Pay & Receive",
+      "description": "Pay the visa fee securely online. Receive your approved e-Visa by email within 3 business days."
+    }
+  },
+  "visaTypes": {
+    "title": "Visa Types & Fees",
+    "subtitle": "Choose the visa that fits your travel purpose",
+    "viewAll": "View All Visa Types",
+    "tourist": {
+      "name": "Tourist",
+      "duration": "Up to 30 days",
+      "fee": "$50",
+      "description": "For leisure travel, sightseeing, and visiting friends or family."
+    },
+    "tourist90": {
+      "name": "Tourist Extended",
+      "duration": "Up to 90 days",
+      "fee": "$70",
+      "description": "Extended stay for longer tourism, trekking, and cultural exploration."
+    },
+    "business": {
+      "name": "Business",
+      "duration": "Up to 90 days",
+      "fee": "$70",
+      "description": "For business meetings, conferences, negotiations, and commercial activities."
+    },
+    "group": {
+      "name": "Group Tourist",
+      "duration": "Up to 30 days",
+      "fee": "$40/person",
+      "description": "Discounted rate for organized tour groups of 5 or more travelers."
+    }
+  },
+  "eligibility": {
+    "title": "Do I Need a Visa?",
+    "subtitle": "Check if you need an e-Visa based on your nationality",
+    "placeholder": "Select your country",
+    "search": "Search countries...",
+    "check": "Check Eligibility",
+    "results": {
+      "visaFree": "Visa-Free Entry",
+      "visaFreeDesc": "Citizens of {country} can enter Kyrgyzstan visa-free for up to {days} days.",
+      "eVisa": "e-Visa Required",
+      "eVisaDesc": "Citizens of {country} can apply for an e-Visa online. Processing takes 3 business days.",
+      "embassy": "Embassy Visa Required",
+      "embassyDesc": "Citizens of {country} need to apply at a Kyrgyz embassy or consulate."
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Quick answers to common questions",
+    "viewAll": "View All FAQs",
+    "q1": {
+      "question": "How long does it take to process an e-Visa?",
+      "answer": "Processing typically takes 3 business days from the date of submission. In peak seasons, it may take up to 5 business days."
+    },
+    "q2": {
+      "question": "What documents do I need to apply?",
+      "answer": "You need a valid passport (with at least 6 months validity), a passport-size digital photo, and a scanned copy of your passport's data page."
+    },
+    "q3": {
+      "question": "Can I extend my e-Visa once in Kyrgyzstan?",
+      "answer": "E-Visas cannot be extended. If you wish to stay longer, you must apply for a new visa or visit the nearest migration service office."
+    },
+    "q4": {
+      "question": "What payment methods are accepted?",
+      "answer": "We accept Visa, Mastercard, and UnionPay credit and debit cards. All transactions are processed securely."
+    },
+    "q5": {
+      "question": "Is the e-Visa valid for multiple entries?",
+      "answer": "The standard e-Visa is single entry. For multiple entries, you may need to apply through a Kyrgyz embassy."
+    }
+  },
+  "footer": {
+    "official": "Official Portal of the Ministry of Foreign Affairs",
+    "republic": "Kyrgyz Republic",
+    "address": "Bishkek, Kyrgyz Republic",
+    "phone": "+996 (312) 62-05-45",
+    "email": "evisa@mfa.gov.kg",
+    "workingHours": "Mon–Fri, 9:00–18:00 (GMT+6)",
+    "quickLinks": "Quick Links",
+    "legal": "Legal",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "accessibility": "Accessibility",
+    "copyright": "© {year} Ministry of Foreign Affairs of the Kyrgyz Republic. All rights reserved."
+  },
+  "apply": {
+    "title": "Apply for e-Visa",
+    "subtitle": "Complete the form below to apply for your electronic visa to the Kyrgyz Republic.",
+    "steps": {
+      "personal": "Personal Info",
+      "passport": "Passport",
+      "travel": "Travel Details",
+      "documents": "Documents",
+      "review": "Review",
+      "payment": "Payment"
+    },
+    "personal": {
+      "title": "Personal Information",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "dateOfBirth": "Date of Birth",
+      "gender": "Gender",
+      "male": "Male",
+      "female": "Female",
+      "nationality": "Nationality",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "selectCountry": "Select country"
+    },
+    "passport": {
+      "title": "Passport Details",
+      "number": "Passport Number",
+      "issueDate": "Date of Issue",
+      "expiryDate": "Date of Expiry",
+      "issuingCountry": "Issuing Country",
+      "expiryWarning": "Passport must be valid for at least 6 months from your travel date."
+    },
+    "travel": {
+      "title": "Travel Details",
+      "entryDate": "Planned Entry Date",
+      "exitDate": "Planned Exit Date",
+      "purpose": "Purpose of Visit",
+      "purposes": {
+        "tourism": "Tourism",
+        "business": "Business",
+        "transit": "Transit",
+        "groupTourism": "Group Tourism"
+      },
+      "accommodation": "Accommodation Address in Kyrgyzstan",
+      "visaType": "Visa Type"
+    },
+    "documents": {
+      "title": "Upload Documents",
+      "photo": "Passport Photo",
+      "photoDesc": "A recent color photo with white background. JPEG or PNG, max 5MB.",
+      "passportScan": "Passport Data Page",
+      "passportScanDesc": "Clear scan of your passport's main page. JPEG or PNG, max 5MB.",
+      "invitation": "Invitation Letter (if applicable)",
+      "invitationDesc": "Required for business visas. PDF, max 10MB.",
+      "dragDrop": "Drag and drop or click to upload",
+      "guidelines": "Photo Guidelines"
+    },
+    "review": {
+      "title": "Review Your Application",
+      "subtitle": "Please verify all information is correct before proceeding to payment.",
+      "edit": "Edit",
+      "confirm": "Confirm & Proceed to Payment"
+    },
+    "payment": {
+      "title": "Payment",
+      "summary": "Fee Summary",
+      "total": "Total Amount",
+      "payNow": "Pay Now",
+      "secure": "Payments are encrypted and processed securely."
+    },
+    "next": "Next",
+    "back": "Back",
+    "saving": "Saving...",
+    "savedDraft": "Draft saved automatically"
+  },
+  "status": {
+    "title": "Check Application Status",
+    "subtitle": "Enter your application details to track your visa status.",
+    "applicationId": "Application ID",
+    "email": "Email Address",
+    "check": "Check Status",
+    "timeline": {
+      "submitted": "Application Submitted",
+      "review": "Under Review",
+      "approved": "Approved",
+      "issued": "Visa Issued",
+      "rejected": "Application Rejected"
+    },
+    "notFound": "No application found with these details. Please check your Application ID and email."
+  },
+  "continuePage": {
+    "title": "Continue Application",
+    "subtitle": "Resume a previously saved application",
+    "refId": "Application Reference Number",
+    "refIdPlaceholder": "KG-2026-XXXXX",
+    "email": "Email Address",
+    "emailPlaceholder": "john@example.com",
+    "resume": "Resume Application",
+    "searching": "Searching...",
+    "notFound": "No application found with this reference number and email. Please double-check your details.",
+    "found": "Application found! Redirecting to your saved application...",
+    "hint": "You can find your reference number in the confirmation email sent when you started your application."
+  },
+  "transferPage": {
+    "title": "Visa Transfer",
+    "subtitle": "Transfer your visa to a new passport",
+    "visaNumber": "Visa Number",
+    "visaNumberPlaceholder": "Enter your visa number",
+    "oldPassport": "Current Passport Number",
+    "oldPassportPlaceholder": "Enter your current passport number",
+    "newPassport": "New Passport Number",
+    "newPassportPlaceholder": "Enter your new passport number",
+    "newPassportExpiry": "New Passport Expiry Date",
+    "email": "Email Address",
+    "emailPlaceholder": "john@example.com",
+    "reason": "Reason for Transfer",
+    "reasons": {
+      "newPassport": "Issued a new passport",
+      "nameChange": "Legal name change",
+      "damaged": "Passport damaged",
+      "other": "Other"
+    },
+    "submit": "Submit Transfer Request",
+    "submitting": "Submitting...",
+    "successTitle": "Transfer Request Submitted",
+    "successMessage": "Your visa transfer request has been submitted. You will receive a confirmation email at {email}. Processing typically takes 5–7 business days.",
+    "trackingId": "Tracking ID",
+    "backHome": "Back to Home",
+    "newRequest": "Submit Another Request",
+    "note": "Please ensure your new passport is valid for at least 6 months from today's date."
+  },
+  "common": {
+    "learnMore": "Learn More",
+    "getStarted": "Get Started",
+    "required": "Required",
+    "optional": "Optional",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "tryAgain": "Try Again",
+    "stepOf": "Step {current} of {total}"
+  }
+}
