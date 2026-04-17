@@ -1,0 +1,27 @@
+databases:
+  - name: kgvisa-db
+    plan: free
+    databaseName: kgvisa
+    user: kgvisa
+
+services:
+  - type: web
+    name: kg-visa-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FRONTEND_URL
+        value: https://kg-visa.vercel.app
+      - key: UPLOAD_DIR
+        value: /tmp/uploads
+      - key: DATABASE_URL
+        fromDatabase:
+          name: kgvisa-db
+          property: connectionString
+      - key: PYTHON_VERSION
+        value: "3.12.0"
