@@ -100,14 +100,23 @@ async def seed_demo_data():
         print("Demo data seeded: demo@evisa.kg / Demo2026!")
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
+import asyncio
+
+async def _background_init():
+    """Run DB init and seeding in background so the app starts fast."""
+    await asyncio.sleep(2)  # Let uvicorn bind the port first
     try:
         await init_db()
         await seed_demo_data()
     except Exception as e:
-        print(f"Warning: startup issue (may be OK): {e}")
+        print(f"Warning: background init issue (may be OK): {e}")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Start DB init in background — don't block the server from binding the port
+    task = asyncio.create_task(_background_init())
     yield
+    task.cancel()
 
 
 API_DESCRIPTION = """
