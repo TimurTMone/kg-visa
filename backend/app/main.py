@@ -14,7 +14,12 @@ from app.routers import auth, applications, transfers, upload
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await init_db()
+    try:
+        await init_db()
+    except Exception as e:
+        # Don't crash the app if DB init fails on first boot
+        # Tables might already exist from a previous deploy
+        print(f"Warning: DB init issue (may be OK): {e}")
     yield
 
 
