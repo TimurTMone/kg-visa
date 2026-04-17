@@ -5,6 +5,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.database import init_db
+# Import all models so Base.metadata knows about them before create_all
+import app.models.user  # noqa: F401
+import app.models.application  # noqa: F401
+import app.models.transfer  # noqa: F401
 from app.routers import auth, applications, transfers, upload
 
 
