@@ -122,19 +122,19 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <button className="text-sm text-neutral-400 transition-colors hover:text-white">
+                <Link href="/privacy" className="text-sm text-neutral-400 transition-colors hover:text-white">
                   {t("privacy")}
-                </button>
+                </Link>
               </li>
               <li>
-                <button className="text-sm text-neutral-400 transition-colors hover:text-white">
+                <Link href="/terms" className="text-sm text-neutral-400 transition-colors hover:text-white">
                   {t("terms")}
-                </button>
+                </Link>
               </li>
               <li>
-                <button className="text-sm text-neutral-400 transition-colors hover:text-white">
+                <Link href="/accessibility" className="text-sm text-neutral-400 transition-colors hover:text-white">
                   {t("accessibility")}
-                </button>
+                </Link>
               </li>
             </ul>
           </div>

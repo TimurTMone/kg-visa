@@ -106,7 +106,16 @@ function LoginForm() {
             </Button>
           </div>
 
-          <p className="mt-6 text-center text-sm text-neutral-500">
+          <div className="mt-4 text-center">
+            <Link
+              href="/forgot-password"
+              className="text-sm text-neutral-400 hover:text-gov-500 transition-colors"
+            >
+              {t("forgotPassword")}
+            </Link>
+          </div>
+
+          <p className="mt-4 text-center text-sm text-neutral-500">
             {t("noAccount")}{" "}
             <Link
               href="/signup"

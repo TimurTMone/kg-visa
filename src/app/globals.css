@@ -130,3 +130,38 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
 }
+
+/* Focus styles for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--color-gov-500);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Subtle pulse for badges */
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  header, footer, nav, .no-print { display: none !important; }
+  body { font-size: 12pt; color: #000; background: #fff; }
+  a { text-decoration: underline; }
+  .print-only { display: block !important; }
+}
