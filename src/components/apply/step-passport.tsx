@@ -8,22 +8,45 @@ import { useWizard } from "./wizard-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, ArrowRight, AlertTriangle } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, AlertTriangle } from "lucide-react";
 import { ALL_COUNTRIES } from "@/lib/constants";
+import { CountryCombobox } from "@/components/shared/country-combobox";
 
 export function StepPassport() {
   const t = useTranslations("apply.passport");
   const tApply = useTranslations("apply");
   const { state, dispatch, nextStep, prevStep } = useWizard();
 
+  // Pre-fill issuing country from nationality (Step 1)
+  const defaultIssuingCountry = state.passport.issuingCountry || state.personal.nationality || "";
+
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<PassportFormData>({
     resolver: zodResolver(passportSchema),
-    defaultValues: state.passport as PassportFormData,
+    defaultValues: {
+      ...(state.passport as PassportFormData),
+      issuingCountry: defaultIssuingCountry,
+    },
   });
+
+  const expiryDate = watch("expiryDate");
+  const issuingCountry = watch("issuingCountry");
+
+  // Smart expiry validation
+  const expiryStatus = (() => {
+    if (!expiryDate) return null;
+    const expiry = new Date(expiryDate);
+    const sixMonths = new Date();
+    sixMonths.setMonth(sixMonths.getMonth() + 6);
+    if (expiry < new Date()) return "expired";
+    if (expiry < sixMonths) return "too-soon";
+    return "valid";
+  })();
 
   const onSubmit = (data: PassportFormData) => {
     dispatch({ type: "SET_PASSPORT", data });
@@ -34,11 +57,6 @@ export function StepPassport() {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div>
         <h2 className="text-xl font-bold text-neutral-900">{t("title")}</h2>
-      </div>
-
-      <div className="flex items-start gap-3 rounded-lg bg-amber-50 p-4 text-sm text-amber-800">
-        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-        {t("expiryWarning")}
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2">
@@ -77,29 +95,41 @@ export function StepPassport() {
             {...register("expiryDate")}
             aria-invalid={!!errors.expiryDate}
           />
+          {/* Smart expiry feedback */}
+          {expiryStatus === "valid" && (
+            <p className="flex items-center gap-1 text-xs text-green-600">
+              <CheckCircle2 className="h-3 w-3" />
+              Valid for your trip
+            </p>
+          )}
+          {expiryStatus === "too-soon" && (
+            <p className="flex items-center gap-1 text-xs text-amber-600">
+              <AlertTriangle className="h-3 w-3" />
+              Passport must be valid for at least 6 months
+            </p>
+          )}
+          {expiryStatus === "expired" && (
+            <p className="flex items-center gap-1 text-xs text-red-600">
+              <AlertTriangle className="h-3 w-3" />
+              This passport has expired
+            </p>
+          )}
           {errors.expiryDate && (
             <p className="text-xs text-error">{errors.expiryDate.message}</p>
           )}
         </div>
 
         <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="issuingCountry">{t("issuingCountry")} *</Label>
-          <select
-            id="issuingCountry"
-            {...register("issuingCountry")}
-            className="flex h-11 w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm text-neutral-900 shadow-sm focus:border-gov-500 focus:outline-none focus:ring-2 focus:ring-gov-500/20"
-          >
-            <option value="">Select country</option>
-            {ALL_COUNTRIES.map((c) => (
-              <option key={c.code} value={c.code}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+          <Label>{t("issuingCountry")} *</Label>
+          <CountryCombobox
+            countries={ALL_COUNTRIES}
+            value={issuingCountry || ""}
+            onChange={(code) => setValue("issuingCountry", code, { shouldValidate: true })}
+            placeholder="Select issuing country"
+            hasError={!!errors.issuingCountry}
+          />
           {errors.issuingCountry && (
-            <p className="text-xs text-error">
-              {errors.issuingCountry.message}
-            </p>
+            <p className="text-xs text-error">{errors.issuingCountry.message}</p>
           )}
         </div>
       </div>

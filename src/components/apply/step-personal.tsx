@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowRight } from "lucide-react";
 import { ALL_COUNTRIES } from "@/lib/constants";
+import { CountryCombobox } from "@/components/shared/country-combobox";
+import { ToggleGroup } from "@/components/ui/toggle-group";
 
 export function StepPersonal() {
   const t = useTranslations("apply.personal");
@@ -19,11 +21,16 @@ export function StepPersonal() {
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<PersonalFormData>({
     resolver: zodResolver(personalSchema),
     defaultValues: state.personal as PersonalFormData,
   });
+
+  const gender = watch("gender");
+  const nationality = watch("nationality");
 
   const onSubmit = (data: PersonalFormData) => {
     dispatch({ type: "SET_PERSONAL", data });
@@ -43,12 +50,9 @@ export function StepPersonal() {
             id="firstName"
             {...register("firstName")}
             aria-invalid={!!errors.firstName}
-            aria-describedby={errors.firstName ? "firstName-error" : undefined}
           />
           {errors.firstName && (
-            <p id="firstName-error" className="text-xs text-error">
-              {errors.firstName.message}
-            </p>
+            <p className="text-xs text-error">{errors.firstName.message}</p>
           )}
         </div>
 
@@ -78,35 +82,30 @@ export function StepPersonal() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="gender">{t("gender")} *</Label>
-          <select
-            id="gender"
-            {...register("gender")}
-            className="flex h-11 w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm text-neutral-900 shadow-sm focus:border-gov-500 focus:outline-none focus:ring-2 focus:ring-gov-500/20"
-          >
-            <option value="">{t("gender")}</option>
-            <option value="male">{t("male")}</option>
-            <option value="female">{t("female")}</option>
-          </select>
+          <Label>{t("gender")} *</Label>
+          <ToggleGroup
+            options={[
+              { value: "male", label: t("male") },
+              { value: "female", label: t("female") },
+            ]}
+            value={gender || ""}
+            onChange={(val) => setValue("gender", val as "male" | "female", { shouldValidate: true })}
+            hasError={!!errors.gender}
+          />
           {errors.gender && (
             <p className="text-xs text-error">{errors.gender.message}</p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="nationality">{t("nationality")} *</Label>
-          <select
-            id="nationality"
-            {...register("nationality")}
-            className="flex h-11 w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm text-neutral-900 shadow-sm focus:border-gov-500 focus:outline-none focus:ring-2 focus:ring-gov-500/20"
-          >
-            <option value="">{t("selectCountry")}</option>
-            {ALL_COUNTRIES.map((c) => (
-              <option key={c.code} value={c.code}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+          <Label>{t("nationality")} *</Label>
+          <CountryCombobox
+            countries={ALL_COUNTRIES}
+            value={nationality || ""}
+            onChange={(code) => setValue("nationality", code, { shouldValidate: true })}
+            placeholder={t("selectCountry")}
+            hasError={!!errors.nationality}
+          />
           {errors.nationality && (
             <p className="text-xs text-error">{errors.nationality.message}</p>
           )}
