@@ -24,8 +24,8 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/";
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("demo@evisa.kg");
+  const [password, setPassword] = useState("Demo2026!");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
