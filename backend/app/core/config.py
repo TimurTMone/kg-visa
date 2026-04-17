@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     FRONTEND_URL: str = "http://localhost:3004"
     UPLOAD_DIR: str = "./uploads"
 
-    model_config = {"env_file": ".env", "extra": "ignore"}
+    model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore", "env_ignore_empty": True}
 
 
 settings = Settings()
